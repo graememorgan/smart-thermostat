@@ -1,0 +1,80 @@
+#schedule {
+	position: relative;
+  margin-left: 100px;
+}
+.row {
+	position: relative;
+}
+.hours {
+  height: 1.5em;
+}
+.hour {
+	position: absolute;
+	box-sizing: border-box;
+	border-left: 1px solid #666;
+  color: #666;
+	padding-left: 3px;
+  line-height: 1.5em;
+}
+.day {
+	height: 40px;
+  margin: 5px 0;
+}
+.day:nth-child(odd) {
+  background: #FBB53B;
+}
+.day:nth-child(even) {
+  background: #FB913B;
+}
+.dayname {
+  margin-left: -100px;
+  width: 90px;
+  text-align: right;
+  line-height: 40px;
+  color: #666;
+  float: left;
+}
+
+.slider {
+	top: 0;
+	left: 0;
+	width: 10px;
+	margin-left: -5px;
+	height: 40px;
+	background: white;
+	left: 0;
+  box-sizing: border-box;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  cursor: ew-resize;
+}
+.temperature {
+  position: absolute;
+  width: 0px;
+  overflow: visible;
+  height: 40px;
+  line-height: 40px;
+}
+.temperature input {
+  width: 20px;
+  margin-left: -10px;
+  text-align: center;
+  display: table-cell;
+  color: #666;
+  border: 1px solid #666;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.75);
+}
+.temperature.forced input {
+  background: white;
+  font-weight: bold;
+}
+button.save {
+  background: #FBB53B;
+  border: 1px solid #666;
+  border-radius: 5px;
+  padding: 0.5em 1em;
+  margin: 1em 0 0 100px;
+  font-size: 1.2em;
+}
+

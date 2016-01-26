@@ -1,0 +1,56 @@
+{% extends "base.htm" %}
+{% block title %}Boiler chart{% endblock %}
+{% block head %}
+  <script src="{{ url_for('static', filename='highcharts.js') }}"></script>
+  <script src="{{ url_for('static', filename='modules/exporting.js') }}"></script>
+  <script type="text/javascript">
+var counter = 0;
+$(function() {
+  var chartOptions = {
+    chart: {
+      type: 'column'
+    },
+    plotOptions: {
+      column: {
+        animation: false
+      }
+    },
+    title: {
+      text: "",
+      style: { display: 'none' }
+    },
+    xAxis: {
+      categories: {{ days | safe }},
+      title: {
+        text: 'Time'
+      }
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Time on'
+      }
+    },
+    credits: {
+      enabled: false
+    },
+    series: [{
+      name: 'Boiler time on',
+      enableMouseTracking: false,
+      data: {{ data | safe }}
+    }]
+  };
+  $('#container').highcharts(chartOptions);
+});
+
+  </script>
+{% endblock %}
+{% block content %}
+<h1>Boiler status</h1>
+
+<div id="breadcrumbs"><a href="/">Home</a></div>
+
+<h2>Time on by day</h2>
+
+<div id="container"></div>
+{% endblock %}

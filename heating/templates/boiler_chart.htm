@@ -1,0 +1,94 @@
+{% extends "base.htm" %}
+{% block title %}Boiler chart{% endblock %}
+{% block head %}
+	<script src="{{ url_for('static', filename='highcharts.js') }}"></script>
+	<script src="{{ url_for('static', filename='modules/exporting.js') }}"></script>
+	<script type="text/javascript">
+var counter = 0;
+$(function() {
+	var chartOptions = {
+		chart: {
+			type: 'spline'
+		},
+		plotOptions: {
+			spline: {
+				animation: false,
+				marker: {
+					enabled: false
+				}
+			},
+      area: {
+        animation: false
+      }
+		},
+		title: {
+			text: "",
+      style: { display: 'none' }
+		},
+		xAxis: {
+			type: 'datetime',
+			title: {
+				text: 'Time'
+			}
+		},
+		yAxis: [
+			{
+				title: {
+					text: 'Temperature'
+				},
+				labels: {
+					format: '{value}°C'
+				}
+			},
+			{
+				title: {
+          text: null
+				},
+				labels: {
+					enabled: false
+				},
+        min: 0,
+        max: 1,
+			}
+		],
+		credits: {
+			enabled: false
+		},
+		series: [
+      {
+				name: 'Boiler on/off',
+				yAxis: 1,
+        type: 'area',
+        color: '#CCCCCC',
+        enableMouseTracking: false,
+				data: {{ data.state }}
+			},
+			{
+				name: 'Temperature',
+				yAxis: 0,
+        color: '#FF0000',
+				data: {{ data.temperature }}
+			},
+			{
+				name: 'Setpoint',
+				yAxis: 0,
+        color: '#000000',
+        enableMouseTracking: false,
+				data: {{ data.setpoint | safe }}
+			}
+		]
+	};
+	$('#container').highcharts(chartOptions);
+});
+
+	</script>
+{% endblock %}
+{% block content %}
+<h1>Boiler status</h1>
+<div id="breadcrumbs"><a href="/">Home</a></div>
+<div class="dates">
+	<a class="prev" href="/boiler/chart/{{ prevDate }}">{{ prevDate }}</a>
+	<a class="next" href="/boiler/chart/{{ nextDate }}">{{ nextDate }}</a>
+</div>
+<div id="container"></div>
+{% endblock %}

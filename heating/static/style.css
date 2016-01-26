@@ -1,0 +1,180 @@
+body {
+  padding: 1em;
+  margin: 0;
+  font-family: sans-serif;
+
+}
+
+h1:first-child {
+  margin-top: 0;
+}
+
+a {
+  color: black;
+}
+
+.location {
+	border: 1px solid #999;
+	border-radius: 1em;
+	margin: 1em;
+	padding: 1em;
+	display: inline-block;
+	color: inherit;
+  text-decoration: none;
+}
+
+.location:hover {
+	border-color: black;
+	background-color: #DDD;
+}
+
+.location div.location-name {
+	font-weight: bold;
+	margin-bottom: 0.5em;
+}
+.location .quantity {
+  display: table-row;
+  line-height: 1.8em;
+}
+.location .quantity>span {
+  display: table-cell;
+
+}
+.location .quantity>span:first-child {
+  padding-right: 0.5em;
+}
+
+.ui-slider {
+  background-color: #FFF;
+  border-radius: 50px;
+  display: inline-block;
+  position: relative;
+  width: 100px;
+  height: 50px;
+  margin: 25px;
+}
+
+.ui-slider.auto::before {
+  background: #999;
+}
+.ui-slider.on::before {
+  background: black;
+}
+
+.ui-slider::after {
+  content: " ";
+  position: absolute;
+  left: 125px;
+  line-height: 50px;
+  margin-left: 10px;
+}
+/*.ui-slider.off::after { content: "off"; }
+.ui-slider.auto::after { content: "auto"; }
+.ui-slider.on::after { content: "on"; }*/
+
+.ui-slider::before {
+  content: ' ';
+  position: absolute;
+  background: white;
+  top: 0;
+  left: -25px;
+  right: -25px;
+  height: 100%;
+  border-radius: 100px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+}
+
+.ui-slider-handle {
+  content: ' ';
+  position: absolute;
+  background: white;
+  top: 2px;
+  left: 2px;
+  z-index: 99999;
+  width: 46px;
+  height: 46px;
+  margin-left: -25px;
+  border-radius: 100px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.5), inset 0 -18px 15px -10px rgba(0,0,0,0.05);
+}
+
+
+input.checkbox + label:active {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+
+input.checkbox:checked + label:before {
+  content: ' ';
+  position: absolute;
+  left: 27px;
+  border-radius: 100px;
+}
+
+#boiler-image {
+  float: left;
+  position: relative;
+  z-index: 100;
+  margin: 40px 60px 100px 60px;
+  width: 80px;
+  height: 60px;
+}
+#boiler-image.on {
+  background: red;
+}
+#boiler-image::before {
+  content: ' ';
+  background: url("/static/boiler.png");
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  z-index: -10;
+  margin: -40px 0 0 -60px;
+}
+#boiler-schedule a {
+  text-decoration: underline;
+}
+#boiler-override input {
+  width: 3em;
+  text-align: right;
+}
+#boiler-links {
+  margin: 1em 0 0 0;
+}
+#boiler-links li {
+  display: inline-block;
+}
+
+.breadcrumbs {
+  font-family: italic;
+}
+
+.dates {
+  overflow: auto;
+}
+
+.prev, .next {
+	display: block;
+	margin: 1em 0;
+	padding: 1em 0.5em;
+	text-decoration: none;
+	color: black;
+  font-weight: bold;
+}
+.prev:hover, .next:hover {
+	background: #DDD;
+}
+.prev {
+	float: left;
+}
+.prev::before {
+  content: "\02190 ";
+}
+.next {
+	float: right;
+}
+.next::after {
+  content: " \02192";
+}
+#container {
+	clear: both;
+}

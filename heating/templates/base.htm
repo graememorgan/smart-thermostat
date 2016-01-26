@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% block title %}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- icon from: http://www.iconsplace.com/red-icons/temperature-icon -->
+  <link rel="shortcut icon" href="static/red-temperature-128.png" type="image/png">
+	<style type="text/css">
+    @import "/static/style.css";
+	{% block css %}{% endblock %}
+	</style>
+	<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='jquery-ui.min.js') }}"></script>
+	{% block head %}{% endblock %}
+</head>
+
+<body>
+	<div id="content">{% block content %}{% endblock %}</div>
+</body>
+
+</html>
+

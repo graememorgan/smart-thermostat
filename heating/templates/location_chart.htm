@@ -1,0 +1,81 @@
+{% extends "base.htm" %}
+{% block title %}Daily chart for {{ location }}{% endblock %}
+{% block head %}
+	<script src="{{ url_for('static', filename='highcharts.js') }}"></script>
+	<script src="{{ url_for('static', filename='modules/exporting.js') }}"></script>
+	<script type="text/javascript">
+var counter = 0;
+$(function() {
+	var chartOptions = {
+		chart: {
+			type: 'spline'
+		},
+		plotOptions: {
+			spline: {
+				animation: false,
+				marker: {
+					enabled: false
+				}
+			}
+		},
+		title: {
+			text: "",
+      style: { display: 'none' }
+		},
+		xAxis: {
+			type: 'datetime',
+			title: {
+				text: 'Time'
+			}
+		},
+		yAxis: [
+			{
+				title: {
+					text: 'Temperature'
+				},
+				labels: {
+					format: '{value}°C'
+				}
+			},
+			{
+				title: {
+					text: 'Humidity'
+				},
+				labels: {
+					format: '{value}%'
+				},
+				opposite: true
+			}
+		],
+		credits: {
+			enabled: false
+		},
+		series: [
+			{
+				name: 'Temperature',
+				yAxis: 0,
+        color: "#C44441",
+				data: {{ data.temperature }}
+			},
+			{
+				name: 'Humidity',
+				yAxis: 1,
+        color: "#1D73AA",
+				data: {{ data.RH }}
+			}
+		]
+	};
+	$('#container').highcharts(chartOptions);
+});
+
+	</script>
+{% endblock %}
+{% block content %}
+<h1>{{ location }} status</h1>
+<div id="breadcrumbs"><a href="/">Home</a></div>
+<div class="dates">
+	<a class="prev" href="/{{ location }}/chart/{{ prevDate }}">{{ prevDate }}</a>
+	<a class="next" href="/{{ location }}/chart/{{ nextDate }}">{{ nextDate }}</a>
+</div>
+<div id="container"></div>
+{% endblock %}

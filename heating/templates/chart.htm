@@ -1,0 +1,115 @@
+{% extends "base.htm" %}
+{% block title %}Charts!{% endblock %}
+{% block css %}
+{% endblock %}
+{% block head %}
+	<script src="{{ url_for('static', filename='highstock.js') }}"></script>
+	<script src="{{ url_for('static', filename='modules/exporting.js') }}"></script>
+	<script type="text/javascript">
+var counter = 0;
+$(function() {
+	var rescaled = function(e) {
+		var chart = $('#container').highcharts();
+
+		chart.showLoading('Loading data from server...');
+		counter = 0;
+		$.each(names, function(i, n) {
+			$.getJSON('/data/' + n[0] + '/' + n[1] + '?start=' + Math.round(e.min) + '&end=' + Math.round(e.max), function(data) {
+				chart.series[i].setData(data);
+				counter += 1;
+				if (counter == names.length) {
+					chart.hideLoading();
+				}
+			});
+		});
+	};
+	var chartOptions = {
+		title: {
+			text: "Chart!"
+		},
+		rangeSelector: {
+			selected: 1
+		},
+		xAxis: {
+			ordinal: false,
+			events: {
+				afterSetExtremes: rescaled
+			},
+			minRange: 60 * 60 * 1000
+		},
+		scrollbar: {
+			liveRedraw: false
+		},
+		/*navigator : {
+			adaptToUpdatedData: false,
+			series : {
+				data : data
+			}
+		},*/
+		yAxis: [],
+		series: []
+	};
+	quantities = ["temperature", "RH", "pressure"];
+	names = [['lounge', 'temperature'], ['Bedroom1', 'temperature'], ['Bedroom2', 'temperature']];
+	$.each(names, function(i, n) {
+		$.getJSON('/data/' + n[0] + '/' + n[1], function(data) {
+			$.each(quantities, function(j, name) {
+				chartOptions['yAxis'][j] = {
+					title: { text: name }
+				};
+			});
+			chartOptions['series'][i] = {
+				name: n[1],
+				yAxis: i,
+				data: data
+			};
+			counter += 1;
+			if (counter == names.length) {
+				$('#container').highcharts('StockChart', chartOptions);
+			}
+		});
+	});
+
+	$("input[type=checkbox]").change(function() {
+		names = $("input[type=checkbox]:checked").map(function(i, e) {
+			return [[$(this).data("location"), $(this).data("quantity")]];
+		});
+		var chart = $('#container').highcharts();
+		while(chart.series.length > 0)
+	    chart.series[0].remove(true);
+
+		chart.showLoading('Loading data from server...');
+		counter = 0;
+		$.each(names, function(i, n) {
+			$.getJSON('/data/' + n[0] + '/' + n[1] + '?start=' + Math.round(0) + '&end=' + Math.round(0), function(data) {
+				chart.addSeries({
+					name: n[1],
+					yAxis: quantities.indexOf(n[1]),
+					data: data
+				});
+				counter += 1;
+				if (counter == names.length) {
+					chart.hideLoading();
+				}
+			});
+		});
+	});
+});
+
+	</script>
+{% endblock %}
+{% block content %}
+<div id="container"></div>
+<div id="traces">
+{% for location, quantities in traces.iteritems() %}
+	<div class="location">
+		<div class="location-name">{{ location }}</div>
+		<ul>
+			{% for quantity in quantities %}
+			<li><label><input type="checkbox" class="quantity" data-location="{{ location }}" data-quantity="{{ quantity }}" /> {{ quantity }}</label></li>
+			{% endfor %}
+		</ul>
+	</div>
+{% endfor %}
+</div>
+{% endblock %}

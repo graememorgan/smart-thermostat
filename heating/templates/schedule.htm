@@ -1,0 +1,123 @@
+{% extends "base.htm" %}
+{% block title %}Schedule{% endblock %}
+{% block css %}
+  @import "/static/schedule.css";
+{% endblock %}
+{% block head %}
+<script type="text/javascript">
+var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var width = 40
+var data = {{ data }};
+
+var moveTemperatures = function() {
+  $(".day").each(function() {
+    var positions = [0].concat($.makeArray($(this).find(".slider").map(function() { return $(this).position().left; }))).concat(24 * width);
+    $(this).find(".temperature").each(function(i, e) {
+      $(this).css({left: (positions[i] + positions[i + 1]) / 2 + "px"});
+    });
+  });
+};
+
+var addSlider = function(e, x) {
+  var slider = $("<div class=\"slider\">");
+  slider.draggable({
+    axis: "x",
+    containment: "parent",
+    scroll: false,
+    grid: [width / 2, width / 2],
+    obstacle: ".slider",
+    preventCollision: true,
+    drag: moveTemperatures
+  }).css({
+    position: "absolute",
+    left: x + "px"
+  }).dblclick(function(e) {
+    var day = $(this).closest(".day");
+    var i = day.find('.slider').index(this);
+    day.find('.temperature')[i].remove();
+    $(this).remove();
+    moveTemperatures();
+    return false;
+  });
+
+  e.append(slider);
+};
+
+var addTemperature= function(e, x, temperature, forced) {
+  var temp = $("<div class=\"temperature\">");
+  temp.css({
+    left: x + "px"
+  }).dblclick(function (e) {
+    $(this).toggleClass("forced");
+    return false;
+  });
+  temp.append($("<input type=\"text\" value=\"0\"/>"));
+  if (forced) {
+    temp.addClass("forced");
+  }
+  if (temperature) {
+    temp.find("input").val(temperature);
+  }
+  e.append(temp);
+};
+
+$(function() {
+	var row = $("<div class=\"row hours\">")
+	for (i = 0; i < 24; i++) {
+		row.append(
+			$("<div class=\"hour\">" + i + "</div>").css({
+				left: width * i + "px",
+				width: width
+			}));
+	}
+	$("#schedule").append(row);
+
+	$.each(days, function(i, day) {
+		var row = $("<div class=\"row day\">").css({
+			width: (24 * width) + "px"
+    }).dblclick(function(e) {
+      var day = $(this).closest(".day");
+      addSlider(day, 23 * width);
+      addTemperature(day, 23 * width);
+      moveTemperatures();
+      return false;
+    });
+
+    if (data) {
+      $.each(data[i][0], function(i, time) {
+        addSlider(row, time * width);
+      });
+      $.each(data[i][1], function(i, temperature) {
+        addTemperature(row, 0, temperature[0], temperature[1]);
+      });
+    } else {
+      addTemperature(row, 0);
+    }
+
+    row.append($("<div class=\"dayname\">" + day + "</div>"));
+
+		$("#schedule").append(row);
+
+	});
+
+  $("button.save").click(function(e) {
+    var data = [];
+    $(".day").each(function() {
+      var positions = $.makeArray($(this).find(".slider").map(function() { return $(this).position().left / width; }))
+      var temperatures = $.makeArray($(this).find(".temperature input").map(function() { return [[parseFloat($(this).val()), $(this).parent().hasClass("forced")]]; }))
+      data.push([positions, temperatures]);
+    });
+    $(this).prop("disabled", true);
+    $.post("/schedule/save", {data: JSON.stringify(data)}, function(e) {
+      $(".save").prop("disabled", false);
+    });
+  });
+  moveTemperatures();
+});
+</script>
+{% endblock %}
+{% block content %}
+<h1>Heating schedule</h1>
+<div id="schedule"></div>
+<div id="save"><button class="save">Save</button></div>
+{% endblock %}

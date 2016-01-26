@@ -1,0 +1,43 @@
+{% extends "base.htm" %}
+{% block title %}Thermostat{% endblock %}
+{% block head %}
+<script type="text/javascript" src="static/index.js"></script>
+{% endblock %}
+{% block content %}
+
+<h1>Temperatures</h1>
+{% for location, quantities in current.iteritems() %}
+	<a class="location" href="/{{ location }}/chart" id="location-{{ location }}">
+    <div class="location-name">{{ location }}</div>
+    <div class="quantities">
+      {% if quantities.temperature %}
+      <div class="quantity"><span class="temperature">Temperature</span><span class="temperature"><span>{{ quantities.temperature }}</span>&deg;C</span></div>
+      {% endif %}
+      {% if quantities.RH %}
+      <div class="quantity"><span class="RH">Humidity</span><span class="RH"><span>{{ quantities.RH }}</span>%</span></div>
+      {% endif %}
+    </div>
+	</a>
+{% endfor %}
+	<!--div id="pressure">
+		Pressure: {{ current["Lounge"]["pressure"] }} Pa
+	</div-->
+
+<h1>Boiler status</h1>
+  <div id="boiler">
+    <a href="/boiler/chart"><div id="boiler-image"></div></a>
+    <div id="boiler-switch"></div> 
+    <div id="boiler-status"></div>
+    <div id="boiler-override">
+      <form method="POST" action="">
+        <input id="boiler-override-temperature" type="number">&deg;C for <input id="boiler-override-remaining" type="number"> minutes.
+        <input type="submit" value="Save">
+      </form>
+    </div>
+    <ul id="boiler-links">
+      <li><a href="/schedule">Schedule</a></li>
+      <li><a href="/boiler/stats">Stats</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
