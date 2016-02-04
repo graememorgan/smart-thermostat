@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, json, request
 from heating.auth import requires_auth
 from database import *
 from collections import OrderedDict
+from common import epoch
 
 boiler = Blueprint("boiler", __name__, template_folder="templates")
 
@@ -96,6 +97,9 @@ def boilerChart(date):
   prevDate = (date - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
   nextDate = (date + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
+  minimum = epoch(date) * 1000
+  maximum = epoch(date + datetime.timedelta(days=1)) * 1000
+
   data = {"temperature": [], "setpoint": [], "state": []}
   q = (BoilerLog
     .select()
@@ -105,13 +109,13 @@ def boilerChart(date):
     )
     .order_by(BoilerLog.time))
   for h in q:
-    time = (h.time - datetime.datetime(1970, 1, 1)).total_seconds() * 1000
+    time = epoch(h.time) * 1000
     data["temperature"].append([time, h.temperature])
     data["setpoint"].append([time, h.setpoint if h.setpoint != 0 else None])
     data["state"].append([time, int(h.boiler)])
   
   data = {key: json.dumps(value) for key, value in data.iteritems()}
-  return render_template("boiler_chart.htm", data=data, prevDate=prevDate, nextDate=nextDate)
+  return render_template("boiler_chart.htm", data=data, prevDate=prevDate, nextDate=nextDate, minimum=minimum, maximum=maximum)
 
 @boiler.route("/boiler/stats")
 @requires_auth

@@ -3,6 +3,7 @@ import datetime
 from collections import defaultdict
 from database import *
 from heating.auth import requires_auth
+from common import epoch
 
 sensors = Blueprint("sensors", __name__, template_folder="templates")
 
@@ -63,6 +64,9 @@ def locationChart(location, date):
   prevDate = (date - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
   nextDate = (date + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
+  minimum = epoch(date) * 1000
+  maximum = epoch(date + datetime.timedelta(days=1)) * 1000
+
   data = {"temperature": [], "RH": []}
   q = (Measurement
     .select()
@@ -77,10 +81,10 @@ def locationChart(location, date):
     )
     .order_by(Measurement.time))
   for m in q:
-    data[m.quantity.name].append([(m.time - datetime.datetime(1970, 1, 1)).total_seconds() * 1000, m.value])
+    data[m.quantity.name].append([epoch(m.time) * 1000, m.value])
   
   data = {key: json.dumps(value) for key, value in data.iteritems()}
-  return render_template("location_chart.htm", data=data, location=location, prevDate=prevDate, nextDate=nextDate)
+  return render_template("location_chart.htm", data=data, location=location, prevDate=prevDate, nextDate=nextDate, minimum=minimum, maximum=maximum)
 
 @sensors.route("/chart")
 def chart():
@@ -96,7 +100,7 @@ def chart():
 def chartData(location, quantity):
   output = []
   for m in Measurement.select().join(Quantity).switch(Measurement).join(Location).where((Quantity.name == quantity) & (Location.name == location)).order_by(Measurement.time):
-    output.append([(m.time - datetime.datetime(1970, 1, 1)).total_seconds() * 1000, m.value])
+    output.append([epoch(m.time) * 1000, m.value])
   return json.dumps(output)
 
 
