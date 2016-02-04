@@ -10,10 +10,8 @@ $(function() {
     chart: {
       type: 'column'
     },
-    plotOptions: {
-      column: {
-        animation: false
-      }
+    legend: {
+      enabled: false
     },
     title: {
       text: "",
@@ -21,22 +19,49 @@ $(function() {
     },
     xAxis: {
       categories: {{ days | safe }},
+      labels: {
+        formatter: function() {
+          var split = this.value.split("-");
+          return split[1] + "/" + split[2];
+        }
+      },
       title: {
-        text: 'Time'
+        text: 'Day'
       }
     },
     yAxis: {
       min: 0,
       title: {
-        text: 'Time on'
+        text: 'Time on / hours'
       }
     },
     credits: {
       enabled: false
     },
+    tooltip: {
+      formatter: function() {
+        return Math.round(this.y) + "h " + Math.round((this.y * 60) % 60) + " m";
+      }
+    },
+    plotOptions: {
+      column: {
+        animation: false,
+      },
+      series: {
+        pointPadding: 0,
+        groupPadding: 0,
+        cursor: 'pointer',
+        point: {
+          events: {
+            click: function() {
+              window.location = "/boiler/chart/" + this.category;
+            }
+          }
+        }
+      }
+    },
     series: [{
       name: 'Boiler time on',
-      enableMouseTracking: false,
       data: {{ data | safe }}
     }]
   };
@@ -46,11 +71,11 @@ $(function() {
   </script>
 {% endblock %}
 {% block content %}
-<h1>Boiler status</h1>
+<h1>Boiler stats</h1>
 
 <div id="breadcrumbs"><a href="/">Home</a></div>
 
-<h2>Time on by day</h2>
+<h2>Boiler time spent firing</h2>
 
 <div id="container"></div>
 {% endblock %}

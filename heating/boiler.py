@@ -120,7 +120,7 @@ def boilerStats():
   # these queries are ugly. it gives days as integers in the format YYMMDD, which then need to be parsed out
 
   # first get all the days in the boiler log (otherwise the next query misses days without heating)
-  key = lambda d: datetime.date(year=int(d / 10000), month=int((d / 100) % 100), day=int(d % 100)).strftime("%m/%d")
+  key = lambda d: datetime.date(year=int(d / 10000), month=int((d / 100) % 100), day=int(d % 100)).strftime("%Y-%m-%d")
   q = (BoilerLog
     .select((fn.FLOOR(BoilerLog.time / 1000000)).alias("day"))
     .distinct())
@@ -133,7 +133,7 @@ def boilerStats():
     .group_by(fn.FLOOR(BoilerLog.time / 1000000)))
 
   for log in q:
-    data[key(log.day)] = log.num
+    data[key(log.day)] = float(log.num) / 60
 
   return render_template("boiler_stats.htm", days=json.dumps(data.keys()), data=json.dumps(data.values()))
 
