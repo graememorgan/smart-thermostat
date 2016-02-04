@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, json, request
 from heating.auth import requires_auth
 from database import *
+from collections import OrderedDict
 
 boiler = Blueprint("boiler", __name__, template_folder="templates")
 
@@ -115,17 +116,24 @@ def boilerChart(date):
 @boiler.route("/boiler/stats")
 @requires_auth
 def boilerStats():
-  # this query is ugly. it gives days as integers in the format YYMMDD, which then need to be parsed out
+  data = OrderedDict()
+  # these queries are ugly. it gives days as integers in the format YYMMDD, which then need to be parsed out
+
+  # first get all the days in the boiler log (otherwise the next query misses days without heating)
+  key = lambda d: datetime.date(year=int(d / 10000), month=int((d / 100) % 100), day=int(d % 100)).strftime("%m/%d")
+  q = (BoilerLog
+    .select((fn.FLOOR(BoilerLog.time / 1000000)).alias("day"))
+    .distinct())
+  for log in q:
+    data[key(log.day)] = 0
+
   q = (BoilerLog
     .select((fn.FLOOR(BoilerLog.time / 1000000)).alias("day"), fn.COUNT(BoilerLog.id).alias("num"))
     .where(BoilerLog.boiler == True)
     .group_by(fn.FLOOR(BoilerLog.time / 1000000)))
 
-  days = []
-  data = []
-
   for log in q:
-    days.append(datetime.date(year=int(log.day / 10000), month=int((log.day / 100) % 100), day=int(log.day % 100)).strftime("%m/%d"))
-    data.append(log.num)
-  return render_template("boiler_stats.htm", days=json.dumps(days), data=json.dumps(data))
+    data[key(log.day)] = log.num
+
+  return render_template("boiler_stats.htm", days=json.dumps(data.keys()), data=json.dumps(data.values()))
 
